@@ -1,0 +1,24 @@
+BiNinja ist ein Mavenprojekt zum Downloaden von Daten von URLs über einen Server, der die Daten von der URL
+base64t, komprimiert und an das Clientprogramm schickt, was die Daten wieder dekomprimiert und entbase64t.
+Das Projekt BiNinja gliedert sich in 4 Unterprojekte:
+    BiNinjaCore
+        Beinhaltet die Kernlogik, die von den anderen Projekten genutzt wird.
+        Die .jar Datei, die aus diesem Projekt hervorgeht ist nicht ausführbar
+        
+    BiNinjaServer
+        Die Serveranwendung des Projekts
+        Die .jar Datei, die aus diesem Projekt hervorgeht ist nicht ausführbar.
+        Ausführbar wird der Code erst durch das Apache Programm Jsvc:
+        https://commons.apache.org/proper/commons-daemon/jsvc.html
+        In dem Projektordner BiNinja/BiNinjaServer/ liegt direkt das vorbereitete Shell-Skript
+        zum Starten und Stoppen der Anwendung (muss eventuell noch angepasst werden).
+        Das Projekt enthält das de.dk.bininja.entrypoint package, welches zum Starten der Anwendung ohne Jsvc ermöglicht (zum Testen in der IDE).
+        Die pom.xml ist so konfiguriert, dass dieses package nicht mitgebaut wird.
+    
+    BiNinjaAdmin
+        Das Admintool zum Befehle auf dem Server absetzen. Kann bisher noch nicht viel.
+        Unter anderem kann man das Serverprogramm auch damit herunterfahren.
+        Als Schnittstelle zum Benutzer ist bisher nur eine Kommandozeilenschnittstelle implementiert.
+    
+    BiNinjaClient
+        Das Clientprogramm kann zum Downloaden von Daten vom Serverprogramm genutzt werden.
