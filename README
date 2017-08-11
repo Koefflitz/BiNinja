@@ -1,24 +1,54 @@
-BiNinja ist ein Mavenprojekt zum Downloaden von Daten von URLs über einen Server, der die Daten von der URL
-base64t, komprimiert und an das Clientprogramm schickt, was die Daten wieder dekomprimiert und entbase64t.
-Das Projekt BiNinja gliedert sich in 4 Unterprojekte:
-    BiNinjaCore
-        Beinhaltet die Kernlogik, die von den anderen Projekten genutzt wird.
-        Die .jar Datei, die aus diesem Projekt hervorgeht ist nicht ausführbar
+BiNinja is maven multi module project for downloading files from URLs through a server from the internet.
+The simplified usage of the program is descibed as follows:
+    The client sends the server a URL to download from.
+    The server downloads the file from the URL
+    The server converts the loaded bytes to text using base64
+    The server sends the "text" to the client
+    The client converts the "text" back to its original format (e.g. binary)
+    The client writes the bytes to a destination (e.g. the filesystem)
+    download complete.
+
+The maven root project BiNinja consists of four direct submodules:
+BiNinjaCore
+    The core project contains the core code needed and in many cases extended by the other projects.
+    
+BiNinjaServer
+    The server application is intended to run as a daemon on a server.
+    To run it as a daemon the program jsvc from apache is required.
+    If jsvc is installed the daemon can be started and stopped with the script at BiNinja/BiNinjaServer/bininja-server.sh
+    Alternatively there is the de.dk.bininja.server.entrypoint package to run the server application in a shell.
+    Default build configuration is to build the entrypoint package.
+    There is a maven profile called no-entrypoint to exlcude the entrypoint package.
+    If built with that profile the resulting jar cannot be started usually with java -jar.
+    
+BiNinjaClient
+    The client program can be used to download files through the server, sending a URL.
+    It connects to the server application using a TCP socket and then sends download requests containing a URL.
+    It contains different user interfaces, a graphical and a command line user interface.
+    To be able to build artifacts containing different ui implementation the project is split into four maven submodules.
+    This project itself doesn't contain any resources needed at runtime directly. It contains the submodules and maven configuration
+    to include/exclude different ui implementations to the artifact such as maven profiles.
+    The maven profile "full" includes all ui implementations to the build process of the artifact.
+    The profile "cli-only" can be used to build an artifact containing a command line user interface implementation only.
+    
+        BiNinjaClientCore
+            The client core project contains the core code needed and extended by the other client projects.
+            It contains the whole code of the program e.g. the "business logic" except the ui implementation.
+            There are interfaces for the ui defined. The implementations are found in other projects.
+            
+        BiNinjaClientCli
+            The client cli project provides a command line interface implementation of the ui interface of the BiNinjaClientCore project.
         
-    BiNinjaServer
-        Die Serveranwendung des Projekts
-        Die .jar Datei, die aus diesem Projekt hervorgeht ist nicht ausführbar.
-        Ausführbar wird der Code erst durch das Apache Programm Jsvc:
-        https://commons.apache.org/proper/commons-daemon/jsvc.html
-        In dem Projektordner BiNinja/BiNinjaServer/ liegt direkt das vorbereitete Shell-Skript
-        zum Starten und Stoppen der Anwendung (muss eventuell noch angepasst werden).
-        Das Projekt enthält das de.dk.bininja.entrypoint package, welches zum Starten der Anwendung ohne Jsvc ermöglicht (zum Testen in der IDE).
-        Die pom.xml ist so konfiguriert, dass dieses package nicht mitgebaut wird.
-    
-    BiNinjaAdmin
-        Das Admintool zum Befehle auf dem Server absetzen. Kann bisher noch nicht viel.
-        Unter anderem kann man das Serverprogramm auch damit herunterfahren.
-        Als Schnittstelle zum Benutzer ist bisher nur eine Kommandozeilenschnittstelle implementiert.
-    
-    BiNinjaClient
-        Das Clientprogramm kann zum Downloaden von Daten vom Serverprogramm genutzt werden.
+        BiNinjaClientGui
+            The client gui project provides a graphical user interface implementation of the ui interface of the BiNinjaClientCore project.
+            
+        BiNinjaClientAssembly
+            The client assembly project is a pure maven configuration project and doesn't contain any resources needed at runtime.
+            It defines build configuration in the pom.xml such as maven profiles.
+            The profile "full" is to build an artifact with all of the ui implementations.
+            The artifact resulting of the maven build of this project is the executable artifact of the client program.
+            
+BiNinjaAdmin
+    The admin program can be used to administrate the server application.
+    It connects to the server application and sends commands that configure the server or read information about
+    the current server state or configuration. It can for example read information about the currently connected clients or shut down the server.
